@@ -3,7 +3,7 @@ class Coffee {
     String name;
     String description;
     double price;
-    private String creator;
+    private final String creator;
     private String client;
 
     public Coffee(int id, String name, String description, double price, String creator) {
@@ -12,7 +12,6 @@ class Coffee {
         this.description = description;
         this.price = price;
         this.creator = creator;
-        this.client = client;
     }
 
     public int getId() {
@@ -35,7 +34,4 @@ class Coffee {
         return creator;
     }
 
-    public String getClient() {
-        return client;
-    }
 }

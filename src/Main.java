@@ -1,3 +1,5 @@
+import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 
@@ -10,117 +12,372 @@ public class Main {
         System.out.println("  \\      /");
         System.out.println("   `'--'");
     }
+    /*Function to print some messages*/
+    public static void printFinalMessages(String input, String color){
+
+        Scanner scanner = new Scanner(System.in);
+        String message = String.format("|  %s  ", input);
+        String colorAdvise = null;
+
+        if(Objects.equals(color, "red")){
+            colorAdvise="\u001B[31m";
+        } else {
+            colorAdvise="\u001B[32m";
+        }
+        System.out.println(colorAdvise + "\n|-----------------------------------------------");
+        System.out.println(message);
+        System.out.println("|-----------------------------------------------\n" + ANSI_RESET);
+
+        scanner.nextLine();
+    }
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+
+    public static boolean isString(String input) {
+        return input.matches("[a-zA-Z]+");
+    }
 
     public static void main(String[] args) {
+        /*Instanciando classes*/
         ShoppingCart shoppingCart =  new ShoppingCart();
         CoffeeProgram program = new CoffeeProgram();
         Scanner scanner = new Scanner(System.in);
+        UserManager userManager = new UserManager();
+
         boolean runningAllSwitch = true;
 
         while (runningAllSwitch) {
-            System.out.println("\n=== Menu ===");
-            System.out.println("1. Perform Login");
-            System.out.println("2. Entrar como cliente [Acesso publico]");
-            System.out.println("0. Exit");
-            System.out.print("Option: ");
+            System.out.println("\n|-------------------------------------------------|");
+            System.out.println("|          MENU INICIAL - [MARKETPLACE]           |");
+            System.out.println("|-------------------------------------------------|");
+            System.out.println("|  01   |    Criar superUsuario                  |");
+            System.out.println("|-------------------------------------------------|");
+            System.out.println("|  02   |    Logar                                |");
+            System.out.println("|-------------------------------------------------|");
+            System.out.println("|  03   |    Entrar como cliente [Acesso publico] |");
+            System.out.println("|-------------------------------------------------|");
+            System.out.println("|  0    |    Sair do programa                     |");
+            System.out.println("|-------------------------------------------------|\n");
+            System.out.print("Opcao: ");
             int option = scanner.nextInt();
-            scanner.nextLine(); // Clear the scanner buffer
+            scanner.nextLine();
 
             switch (option) {
-                case 1 -> {
-                    System.out.print("Username: ");
+                case 1->{
+                    System.out.print("Informe o Nome do Usuario: ");
+                    String name = scanner.nextLine();
+                    while (!isString(name)) {
+                        System.out.println(ANSI_RED + "Entrada inválida. Por favor, informe uma [STRING]" + ANSI_RESET);
+                        name = scanner.next();
+                    }
+
+                    System.out.println("Digite a idade do usuario:");
+                    int age;
+                    do {
+                        while (!scanner.hasNextInt()) {
+                            System.out.println(ANSI_RED + "Entrada inválida. Por favor, informe um [NUMERO]."+ ANSI_RESET);
+
+                        }
+                        age = scanner.nextInt();
+                    } while (age <= 0);
+                    scanner.nextLine();
+
+                    System.out.println(ANSI_RED +"\n|-------------------------------------------------|");
+                    System.out.println("|          ATENCAO! -[INFORME A ROLE DO USUARIO]  |");
+                    System.out.println("|-------------------------------------------------|");
+                    System.out.println("|  01   |     SuperAdmin-[TOTAL ACESSO]           |");
+                    System.out.println("|-------------------------------------------------|");
+                    System.out.println("|  02   |     Admin-[ACESSO PARCIAL]              |");
+                    System.out.println("|-------------------------------------------------|\n"+ ANSI_RESET);
+                    System.out.print("Informe a Role do Usuario:  ");
+                    int roleOption = scanner.nextInt();
+                    String role = null;
+                    switch (roleOption){
+                        case 1-> role = "superAdmin";
+                        case 2-> role = "admin";
+                    }
+                    if(Objects.equals(role, "superAdmin")){
+                        System.out.println(ANSI_RED +"Importante! - Essa role vai dar total acesso ao usuario cadastrado!"+ ANSI_RESET);
+                        scanner.nextLine();
+                    }
+
+
+                    System.out.print("Informe a senha:  ");
+                    String password = scanner.next();
+                    while (!isString(password)) {
+                        System.out.println(ANSI_RED + "Entrada inválida. Por favor, informe uma [STRING]" + ANSI_RESET);
+                        password = scanner.next();
+                    }
+
+                    userManager.addUser(name, age, role,  password);
+
+                    printFinalMessages("USUARIO ADICIONADO COM SUCESSO !", "green");
+                }
+                case 2 -> {
+                    printFinalMessages("BEM VINDO AO LOGIN", "green");
+
+                    System.out.print("Por favor infome seu nome: ");
                     String username = scanner.nextLine();
-                    System.out.print("Password: ");
+                    System.out.print("Por favor informe sua senha: ");
                     String password = scanner.nextLine();
-                    program.login(username, password);
+
+                    User userExists = program.login(username, password, userManager);
+
+                    if(userExists == null){
+                        break;
+                    }
+
                     boolean runningUserLoggedSwitch = true;
                     while (runningUserLoggedSwitch) {
-                        System.out.print("Bem vindo " + username);
-                        System.out.print("1 - adicionar cafe ");
-                        System.out.print("2 - remover cafe ");
-                        System.out.print("3 modificar cafe ");
-                        System.out.print("4 list all coffes ");
-                        System.out.print("5 Log Out ");
+                        System.out.println( ANSI_GREEN + "\n|-------------------------------------------------|");
+                        System.out.println("|          GERENCIAMENTO DE ESTOQUE               |");
+                        System.out.println("|-------------------------------------------------|" +ANSI_RESET);
+                        System.out.println("|          BEM VINDO (A) - [ " + username + " ]");
+                        System.out.println("|-------------------------------------------------|");
+                        System.out.println("|  01   |    Adicionar um cafe no [estoque]       |");
+                        System.out.println("|-------------------------------------------------|");
+                        System.out.println("|  02   |    Remover um cafe do [estoque]         |");
+                        System.out.println("|-------------------------------------------------|");
+                        System.out.println("|  03   |    Modificar um cafe do [estoque]       |");
+                        System.out.println("|-------------------------------------------------|");
+                        System.out.println("|  04   |    Listar todos os cafes no [estoque]   |");
+                        System.out.println("|-------------------------------------------------|\n");
+                        System.out.println(ANSI_GREEN+"|-------------------------------------------------|");
+                        System.out.println("|          GERENCIADOR DE FUNCIONARIOS            |");
+                        System.out.println("|-------------------------------------------------|"+ANSI_RESET);
+                        System.out.println("|  05   |    Listar todos funcionarios            |");
+                        System.out.println("|-------------------------------------------------|");
+                        System.out.println("|  06   |    Remover um Funcionario               |");
+                        System.out.println("|-------------------------------------------------|");
+                        System.out.println("|  07   |    Mudar Role de um funcionario         |");
+                        System.out.println("|-------------------------------------------------|");
+                        System.out.println("|  08   |    Fazer LogOut                         |");
+                        System.out.println("|-------------------------------------------------|\n");
+                        System.out.println("Informe sua opcao: ");
                         int loggedInUserOption = scanner.nextInt();
 
                         switch (loggedInUserOption) {
                             case 1 -> {
-                                System.out.print("Coffee Name: ");
+                                scanner.nextLine();
+                                System.out.print("Informe o nome do Cafe: ");
                                 String name = scanner.nextLine();
-                                System.out.print("Coffee Description: ");
+                                while (!isString(name)) {
+                                    System.out.println(ANSI_RED + "Entrada inválida. Por favor, informe uma [STRING]" + ANSI_RESET);
+                                    name = scanner.next();
+                                }
+
+                                System.out.print("Informe a descricao do cafe: ");
                                 String description = scanner.nextLine();
-                                System.out.print("Coffee Price: ");
-                                double price = scanner.nextDouble();
-                                scanner.nextLine(); // Clear the scanner buffer
+                                while (!isString(description)) {
+                                    System.out.println(ANSI_RED + "Entrada inválida. Por favor, informe uma [STRING]" + ANSI_RESET);
+                                    description = scanner.next();
+                                }
+                                System.out.print("Informe o preco do cafe: ");
+                                double price;
+                                do {
+                                    while (!scanner.hasNextInt()) {
+                                        System.out.println(ANSI_RED + "Entrada inválida. Por favor, informe um [NUMERO]."+ ANSI_RESET);
+                                        scanner.next();
+                                    }
+                                    price = scanner.nextDouble();
+                                } while (price <= 0);
+
+                                scanner.nextLine();
                                 program.addCoffee(name, description, price, program.getLoggedInUser());
                             }
                             case 2 -> {
-                                System.out.print("ID of the Coffee to remove: ");
-                                int idToRemove = scanner.nextInt();
+                                System.out.print("Informe o ID do cafe que deseja remover do estoque: ");
+                                int idToRemove;
+                                do {
+                                    while (!scanner.hasNextInt()) {
+                                        System.out.println(ANSI_RED + "Entrada inválida. Por favor, informe um [NUMERO]."+ ANSI_RESET);
+                                        scanner.next();
+                                    }
+                                    idToRemove = scanner.nextInt();
+                                } while (idToRemove <= 0);
                                 scanner.nextLine(); // Clear the scanner buffer
                                 program.removeCoffee(idToRemove);
                             }
                             case 3 -> {
-                                System.out.print("ID of the Coffee to modify: ");
-                                int idToModify = scanner.nextInt();
+                                System.out.print("Informe o ID do cafe que deseja modificar: ");
+                                int idToModify;
+                                do {
+                                    while (!scanner.hasNextInt()) {
+                                        System.out.println(ANSI_RED + "Entrada inválida. Por favor, informe um [NUMERO]."+ ANSI_RESET);
+                                        scanner.next();
+                                    }
+                                    idToModify= scanner.nextInt();
+                                } while (idToModify <= 0);
                                 scanner.nextLine(); // Clear the scanner buffer
                                 program.modifyCoffee(idToModify);
                             }
                             case 4 -> program.listCoffees();
-                            case 5 -> {
+                            case 5->{
+                                List<User> users = userManager.getUsers();
+                                printFinalMessages("LISTANDO TODOS USUARIOS CADASTRADOS", "green");
+                                for (User user : users) {
+                                    System.out.println("\n|---------------------------------|");
+                                    System.out.println("|  ID      | " + user.getId());
+                                    System.out.println("|---------------------------------|");
+                                    System.out.println("|  NOME    | " + user.getName());
+                                    System.out.println("|---------------------------------|");
+                                    System.out.println("|  IDADE   | " + user.getAge());
+                                    System.out.println("|---------------------------------|");
+                                    System.out.println("|  ROLE    | " + user.getRole());
+                                    System.out.println("|---------------------------------|\n");
+                                    scanner.nextLine();
+                                }
+
+                            }
+                            case 6 -> {
+                                if(!Objects.equals(userExists.getRole(), "superAdmin")){
+                                    printFinalMessages("VOCE NAO TEM PERMISSAO PARA REMOVER FUNCIONARIOS", "red");
+                                    break;
+                                }
+                                System.out.print("Informe o ID do usuario que deseja remover: ");
+                                int idToRemove;
+                                do {
+                                    while (!scanner.hasNextInt()) {
+                                        System.out.println(ANSI_RED + "Entrada inválida. Por favor, informe um [NUMERO]."+ ANSI_RESET);
+                                        scanner.next();
+                                    }
+                                    idToRemove= scanner.nextInt();
+                                } while (idToRemove <= 0);
+
+                                scanner.nextLine(); // Clear the scanner buffer
+                                boolean userExclude = userManager.removeUser(idToRemove);
+                                if(!userExclude){
+                                    printFinalMessages("USUARIO NAO ENCONTRADO","red");
+                                }
+                                printFinalMessages("USUARIO REMOVIDO COM SUCESSO!","green");
+                            }
+                            case 7 ->{
+                                if(!Objects.equals(userExists.getRole(), "superAdmin")){
+                                    printFinalMessages("VOCE NAO TEM PERMISSAO PARA ALTERAR ESSA ROLE", "red");
+                                    break;
+                                }
+                                System.out.print("Informe qual ID do usuario que deseja modificar a role: ");
+                                int idToChangeRole;
+                                do {
+                                    while (!scanner.hasNextInt()) {
+                                        System.out.println(ANSI_RED + "Entrada inválida. Por favor, informe um [NUMERO]."+ ANSI_RESET);
+                                        scanner.next();
+                                    }
+                                    idToChangeRole= scanner.nextInt();
+                                } while (idToChangeRole <= 0);
+                                scanner.nextLine(); // Clear the scanner buffer
+
+
+                                System.out.println(ANSI_RED +"\n|-------------------------------------------------|");
+                                System.out.println("|     ATENCAO! -[INFORME A NOVA ROLE DO USUARIO]  |");
+                                System.out.println("|-------------------------------------------------|");
+                                System.out.println("|  01   |     SuperAdmin-[TOTAL ACESSO]           |");
+                                System.out.println("|-------------------------------------------------|");
+                                System.out.println("|  02   |     Admin-[ACESSO PARCIAL]              |");
+                                System.out.println("|-------------------------------------------------|\n"+ ANSI_RESET);
+                                System.out.print("Informe a Role do Usuario:  ");
+                                int roleOption = scanner.nextInt();
+                                String role = null;
+                                switch (roleOption){
+                                    case 1-> role = "superAdmin";
+                                    case 2-> role = "admin";
+                                }
+                                if(Objects.equals(role, "superAdmin")){
+                                    System.out.println(ANSI_RED +"Importante! - Essa role vai dar total acesso ao usuario cadastrado!"+ ANSI_RESET);
+                                    scanner.nextLine();
+                                }
+                                boolean userRoleChanged = userManager.changeUserRole(idToChangeRole, role);
+                                if(!userRoleChanged){
+                                    printFinalMessages("USUARIO NAO ENCONTRADO","red");
+
+                                }
+                            }
+
+                            case 8 -> {
                                 program.logout();
+                                printFinalMessages("USUARIO DESLOGADO COM SUCESSO!", "green");
                                 runningUserLoggedSwitch = false;
                             }
-                            default -> System.out.println("Invalid option!");
+                            default -> printFinalMessages("OPCAO INVALIDA", "red");
                         }
                     }
                 }
-                case 2 -> {
-                    System.out.println("Antes que seja possivel alguma entrada de dados necessitamos do seu nome para registro");
+                case 3 -> {
+                    System.out.println(ANSI_GREEN+"\n\n|-------------------------------------------------|");
+                    System.out.println("          BEM VINDO (A) AO COFFE DELIVERY         ");
+                    System.out.println("|-------------------------------------------------|\n"+ ANSI_RESET);
+                    printCoffe();
+                    System.out.println("Antes que seja possivel alguma entrada de dados necessitamos do seu nome para registro: ");
                     String clientName = scanner.next();
                     boolean runningClientSwitch = true;
                     while (runningClientSwitch) {
-                        System.out.println("Bem vindo " + clientName + "ao Coffe Delivery");
-                        System.out.println("Escolha uma opcao");
-                        System.out.println("1. listar os cafes do menu");
-                        System.out.println("2. Adicionar um cafe");
-                        System.out.println("3. Remove Coffee to cart");
-                        System.out.println("4. List Coffees on cart");
-                        System.out.println("5 Back menu");
-
-                        scanner.nextLine();
+                        System.out.println("\n|          BEM VINDO (A) - [ " + clientName + " ]");
+                        System.out.println("|-------------------------------------------------|");
+                        System.out.println("|  01   | Listar todos cafe no [Menu]             |");
+                        System.out.println("|-------------------------------------------------|");
+                        System.out.println("|  02   | Adicionar um cafe ao Carrinho de compras|");
+                        System.out.println("|-------------------------------------------------|");
+                        System.out.println("|  03   | Remover um cafe do Carrinho de compras  |");
+                        System.out.println("|-------------------------------------------------|");
+                        System.out.println("|  04   | Listar os cafes do Carrinho de compras  |");
+                        System.out.println("|-------------------------------------------------|");
+                        System.out.println("|  05   | Retornar ao menu inicial                |");
+                        System.out.println("|-------------------------------------------------|\n");
                         int optionCart = scanner.nextInt();
 
                         switch (optionCart) {
                             case 1 -> program.listCoffees();
                             case 2 -> {
-                                System.out.print("ID of the Coffee to add on your cart: ");
-                                int idToAdd = scanner.nextInt();
+                                System.out.print("Informe o ID do cafe que deseja adicionar ao carrinho: ");
+                                int idToAdd;
+                                do {
+                                    while (!scanner.hasNextInt()) {
+                                        System.out.println(ANSI_RED + "Entrada inválida. Por favor, informe um [NUMERO]."+ ANSI_RESET);
+                                        scanner.next();
+                                    }
+                                    idToAdd= scanner.nextInt();
+                                } while (idToAdd <= 0);
+
+                                scanner.nextLine(); // Clear the scanner buffer
                                 Coffee coffeToAddOnCart = program.searchCoffeById(idToAdd);
                                 shoppingCart.addProduct(coffeToAddOnCart);
                             }
                             case 3 -> {
-                                System.out.print("ID of the Coffee to remove: ");
-                                int idToRemove = scanner.nextInt();
+                                System.out.print("Informe o ID do cafe que deseja remover do carrinho: ");
+                                int idToRemove;
+                                do {
+                                    while (!scanner.hasNextInt()) {
+                                        System.out.println(ANSI_RED + "Entrada inválida. Por favor, informe um [NUMERO]."+ ANSI_RESET);
+                                        scanner.next();
+                                    }
+                                    idToRemove= scanner.nextInt();
+                                } while (idToRemove <= 0);
+
                                 scanner.nextLine(); // Clear the scanner buffer
                                 shoppingCart.removeProduct(idToRemove);
                             }
                             case 4 -> shoppingCart.displayCart();
                             case 5 -> {
                                 runningClientSwitch = false;
-                                System.out.print("Retornando ao menu inicial\n");
+                                printFinalMessages("RETORNANDO AO MENU INICIAL", "green");
                                 printCoffe();
 
                             }
 
-                            default -> System.out.println("Invalid option!");
+                            default -> printFinalMessages("OPCAO INVALIDA", "red");
                         }
                     }
                 }
                 case 0 -> runningAllSwitch = false;
-                default -> System.out.println("Invalid option!");
+                default -> printFinalMessages("OPCAO INVALIDA", "red");
             }
         }
-        System.out.println("Program terminated.");
+        System.out.println("AGRADECEMOS POR UTILIZAR NOSSOS PROGRAMAS! ");
+        System.out.println(ANSI_GREEN + "\nBBBBB  Y     Y  EEEEE");
+        System.out.println("B    B  Y   Y   E    ");
+        System.out.println("BBBBB    Y Y    EEEE ");
+        System.out.println("B    B    Y     E    ");
+        System.out.println("BBBBB     Y     EEEEE" + ANSI_RESET);
     }
 }
